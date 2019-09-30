@@ -1,0 +1,13 @@
+body {
+  font-size: 33px; }
+
+p {
+  font-size: 66px;
+  margin: 0; }
+
+body {
+  background: #7dc0d4;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex; }
