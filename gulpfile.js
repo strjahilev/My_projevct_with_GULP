@@ -31,20 +31,20 @@ gulp.task('scssTocss',   function () {
         });
 //concat all JS files to one, next compress and rename
 gulp.task('compressJs', function () {
-        return gulp.src('src/js/**/*.js')
-            .pipe(concat('../lib/all-common.js'))
+        return gulp.src('src/source-js/**/*.js')
+            .pipe(concat('../js/all-common.js'))
             .pipe(uglify())
             .pipe(rename({
                 suffix: '.min'
             }))
             .pipe(gulp.dest('src/js')
                 )
-});
+            });
 //minify jQuery lib's file
 gulp.task('scripts', async function (){
     return gulp.src('node_modules/jquery/dist/jquery.min.js')
-        .pipe(uglify())
-        .pipe(gulp.dest('src/lib'))
+        .pipe(prettify({indent_char: '', indent_size: 2}))
+        .pipe(gulp.dest('src/js'))
 });
 //minify image files
 gulp.task('img', async function () {
@@ -63,7 +63,7 @@ gulp.task('img', async function () {
 gulp.task('minifyHtml', async function() {
     gulp.src('src/*.html')
         .pipe(minifyInline())
-        .pipe(gulp.dest('dist'))
+        .pipe(gulp.dest('dist/'))
 });
 
 //listen server, start
@@ -79,15 +79,17 @@ gulp.task('browser', function () {
 //watching all changes in files. It's for create project
 gulp.task('watch', async function () {
     gulp.watch('src/scss/**/*.scss', gulp.parallel('scssTocss'));
-    // gulp.watch('src/*.html', gulp.parallel('minifyHtml'));
-    gulp.watch('src/js/**/*.js', gulp.parallel('compressJs'));
+    gulp.watch('src/*.html', gulp.parallel('minifyHtml'));
+    gulp.watch('src/source-js/**/*.js', gulp.parallel('compressJs'));
     gulp.watch('src/**/*.html').on('change', browserSync.reload);
     gulp.watch('src/**/*.css').on('change', browserSync.reload);
+    gulp.watch('src/source-js/**/*.js').on('change', browserSync.reload);
+
     // gulp.watch('src/js/**/*.js').on('change', browserSync.reload)
 
 });
 //-------------------------------------------------------------
-gulp.task ( 'default', gulp.parallel('browser', 'scssTocss','compressJs','watch' ));
+gulp.task ( 'default', gulp.parallel('browser', 'scssTocss', 'compressJs', 'minifyHtml','watch' ));
 //------------------------------------------------------------------------------------------
 // очистка перед сборкой проэкта
 gulp.task('clean', async function () {
@@ -106,7 +108,7 @@ gulp.task('construct', async function () {
         .pipe(gulp.dest('dist/css'));
     let buildFonts = gulp.src('src/fonts/**/*')
         .pipe(gulp.dest('dist/fonts'));
-    let buildJs= gulp.src('src/lib/**/*')
+    let buildJs= gulp.src('src/js/*')
         .pipe(gulp.dest('dist/js'));
     // let buildHtml = gulp.src('src/*.html')
     //     .pipe(minifyInline())
@@ -115,6 +117,6 @@ gulp.task('construct', async function () {
 });
 
 //полная сборка проэкта
-gulp.task('build', gulp.parallel('clean', 'img','scssTocss', '','compressJs','scripts', 'construct'));
+gulp.task('build', gulp.parallel('clean', 'img','scssTocss', 'minifyHtml','compressJs','scripts', 'construct'));
 //запуск сервера для просмотра всех изменений на стадии разработки
 
